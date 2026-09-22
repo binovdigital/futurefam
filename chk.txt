@@ -1,0 +1,10 @@
+﻿node.exe : The following Vite config options will be overridden by SvelteKit:
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (The following V...n by SvelteKit::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  - root
+1790068419932 START "c:\\agenttest\\ff"
+1790068420010 COMPLETED 1806 FILES 0 ERRORS 0 WARNINGS 0 FILES_WITH_PROBLEMS
