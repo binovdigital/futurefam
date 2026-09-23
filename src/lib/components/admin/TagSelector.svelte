@@ -14,6 +14,40 @@
 
 	let query = $state('');
 
+	let showTagDropdown = $state(false);
+
+	let container: HTMLDivElement | undefined = $state(undefined);
+	let inputEl: HTMLInputElement | undefined = $state(undefined);
+	let blurTimeout: ReturnType<typeof setTimeout> | undefined;
+
+	function openDropdown() {
+		if (blurTimeout) clearTimeout(blurTimeout);
+		showTagDropdown = true;
+	}
+
+	function scheduleClose() {
+		if (blurTimeout) clearTimeout(blurTimeout);
+		blurTimeout = setTimeout(() => {
+			showTagDropdown = false;
+		}, 150);
+	}
+
+	function handleWindowClick(e: MouseEvent) {
+		if (!showTagDropdown) return;
+		const target = e.target as Node | null;
+		if (container && target && !container.contains(target)) {
+			showTagDropdown = false;
+		}
+	}
+
+	function selectTag(id: number) {
+		toggle(id);
+		query = '';
+		// Keep the dropdown open for multi-select, then refocus the input.
+		openDropdown();
+		inputEl?.focus();
+	}
+
 	let suggestions = $derived(
 		query.trim()
 			? allTags
@@ -45,7 +79,9 @@
 	}
 </script>
 
-<div>
+<svelte:window onclick={handleWindowClick} />
+
+<div bind:this={container}>
 	{#if selectedTags.length > 0}
 		<ul class="mb-2 flex flex-wrap gap-2" aria-label="Tag terpilih">
 			{#each selectedTags as tag (tag.id)}
@@ -66,31 +102,41 @@
 
 	<div class="relative">
 		<input
+			bind:this={inputEl}
 			type="text"
 			bind:value={query}
 			{placeholder}
 			aria-label="Cari atau pilih tag"
+			role="combobox"
+			aria-expanded={showTagDropdown}
+			aria-controls="tag-suggestions"
+			aria-autocomplete="list"
+			autocomplete="off"
+			onfocus={openDropdown}
+			oninput={openDropdown}
+			onblur={scheduleClose}
 			onkeydown={(e) => {
 				if (e.key === 'Enter') {
 					e.preventDefault();
-					if (suggestions.length === 1) toggle(suggestions[0].id);
+					if (suggestions.length === 1) selectTag(suggestions[0].id);
 					else addByQuery();
+				} else if (e.key === 'Escape') {
+					showTagDropdown = false;
+					inputEl?.blur();
 				}
 			}}
 			class="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none placeholder:text-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
 		/>
-		{#if query.trim() || suggestions.length > 0}
-			<ul class="absolute inset-x-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl" role="listbox" aria-label="Saran tag">
+		{#if showTagDropdown && (query.trim() || suggestions.length > 0)}
+			<ul id="tag-suggestions" class="absolute inset-x-0 top-full z-10 mt-1 max-h-48 overflow-y-auto rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl" role="listbox" aria-label="Saran tag">
 				{#each suggestions as tag (tag.id)}
 					<li>
 						<button
 							type="button"
 							role="option"
 							aria-selected={selected.includes(tag.id)}
-							onclick={() => {
-								toggle(tag.id);
-								query = '';
-							}}
+							onmousedown={(e) => e.preventDefault()}
+							onclick={() => selectTag(tag.id)}
 							class="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm font-medium text-slate-700 hover:bg-teal-50"
 						>
 							<Plus class="h-3.5 w-3.5 text-teal-600" /> {tag.name}
