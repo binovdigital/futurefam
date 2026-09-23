@@ -75,14 +75,27 @@
 <!-- HERO: 1 large + 2 small -->
 <header class="mx-auto max-w-6xl px-4 pt-6 sm:px-6 sm:pt-10" aria-label="Sorotan utama">
 	<div class="grid gap-5 lg:grid-cols-3">
-		<article class="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm lg:col-span-2">
-			<a href={`/post/${heroMain.slug}`} class="relative block min-h-72 overflow-hidden sm:min-h-96" aria-label={heroMain.title}>
-				<img src={heroCover} alt={heroMain.title} class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+		<!-- Featured card: flex column so the media link stretches with the grid row
+		     (the right column is often taller) — the cover + gradient always reach
+		     the bottom edge, so no white strip is left under the image. -->
+		<article
+			class="group relative flex min-h-72 flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm sm:min-h-96 lg:col-span-2"
+		>
+			<a
+				href={`/post/${heroMain.slug}`}
+				class="relative flex flex-1 flex-col justify-end overflow-hidden"
+				aria-label={heroMain.title}
+			>
+				<img
+					src={heroCover}
+					alt={heroMain.title}
+					class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+				/>
 				<span class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent"></span>
 				<span class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-teal-600 px-3 py-1.5 text-xs font-bold text-white shadow">
 					<Sparkles class="h-3.5 w-3.5" /> Sorotan
 				</span>
-				<span class="absolute inset-x-0 bottom-0 block p-5 sm:p-7">
+				<span class="relative mt-auto block p-5 sm:p-7">
 					<span class="flex flex-wrap items-center gap-2 text-xs font-bold">
 						<span class="rounded-full bg-white/95 px-3 py-1 text-teal-700">{heroCategory}</span>
 						<span class="flex items-center gap-1 font-medium text-white/85">
@@ -109,6 +122,8 @@
 					(Array.isArray(post.post_categories)
 						? post.post_categories[0]?.name
 						: post.post_categories?.name) ?? 'Artikel'}
+				<!-- Side card: same pattern (min-height on the wrapper + absolutely
+				     positioned link) so the cover always fills the stretched cell. -->
 				<article class="group relative min-h-56 overflow-hidden rounded-3xl border border-slate-200 shadow-sm">
 					<a href={`/post/${post.slug}`} class="absolute inset-0" aria-label={post.title}>
 						<img src={cover} alt={post.title} loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105" />
